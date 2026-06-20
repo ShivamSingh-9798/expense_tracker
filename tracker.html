@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <style>
+        /* CSS Styling */
+        body { 
+            font-family: sans-serif; 
+            max-width: 500px; 
+            margin: 2rem auto; 
+            padding: 1rem; 
+        }
+        .dashboard-card { 
+            padding: 1rem; 
+            border-radius: 8px; 
+            background: #f4f4f9; 
+            text-align: center; 
+            margin-bottom: 1rem; 
+        }
+        .form-group { 
+            margin-bottom: 1rem; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        input, select, button { 
+            padding: 0.5rem; 
+            margin-top: 0.25rem; 
+            font-size: 1rem;
+        }
+        button { 
+            cursor: pointer; 
+            border: none; 
+            border-radius: 4px; 
+            background: #007bff; 
+            color: white; 
+            padding: 10px;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .expense-list { 
+            list-style: none; 
+            padding: 0; 
+        }
+        .expense-item { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 0.5rem; 
+            border-bottom: 1px solid #ddd; 
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HTML Layout -->
+    <div class="dashboard-card">
+        <h2>Total Expenses</h2>
+        <h1 id="total-display">$0.00</h1>
+    </div>
+
+    <form id="expense-form">
+        <div class="form-group">
+            <label for="expense-name">Description</label>
+            <input type="text" id="expense-name" required placeholder="e.g., Groceries">
+        </div>
+        <div class="form-group">
+            <label for="expense-amount">Amount</label>
+            <input type="number" id="expense-amount" required min="0.01" step="0.01" placeholder="0.00">
+        </div>
+        <div class="form-group">
+            <label for="expense-category">Category</label>
+            <select id="expense-category">
+                <option value="Food">Food</option>
+                <option value="Transport">Transport</option>
+                <option value="Utilities">Utilities</option>
+                <option value="Entertainment">Entertainment</option>
+            </select>
+        </div>
+        <button type="submit">Add Expense</button>
+    </form>
+
+    <h3>Recent Transactions</h3>
+    <ul id="expense-list" class="expense-list"></ul>
+
+    <!-- JavaScript Logic embedded directly inside the HTML file -->
+    <script>
+        // 1. State Management
+        let expenses = [];
+        let total = 0;
+
+        // 2. DOM Elements
+        const expenseForm = document.getElementById('expense-form');
+        const expenseNameInput = document.getElementById('expense-name');
+        const expenseAmountInput = document.getElementById('expense-amount');
+        const expenseCategoryInput = document.getElementById('expense-category');
+        const expenseList = document.getElementById('expense-list');
+        const totalDisplay = document.getElementById('total-display');
+
+        // 3. Event Listener for Form Submission
+        expenseForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent page reload
+
+            // Get values from inputs
+            const name = expenseNameInput.value;
+            const amount = parseFloat(expenseAmountInput.value);
+            const category = expenseCategoryInput.value;
+
+            // Create an expense object
+            const expense = {
+                id: Date.now(), // simple unique ID
+                name: name,
+                amount: amount,
+                category: category
+            };
+
+            // Update state
+            expenses.push(expense);
+            total += amount;
+
+            // Update UI
+            updateDashboard();
+            
+            // Clear form inputs
+            expenseForm.reset();
+        });
+
+        // 4. Update the UI
+        function updateDashboard() {
+            // Update total
+            totalDisplay.textContent = `$${total.toFixed(2)}`;
+
+            // Re-render list
+            expenseList.innerHTML = ''; // Clear current list
+            expenses.forEach(expense => {
+                const li = document.createElement('li');
+                li.className = 'expense-item';
+                li.innerHTML = `
+                    <span><strong>${expense.name}</strong> (${expense.category})</span>
+                    <span>$${expense.amount.toFixed(2)}</span>
+                `;
+                expenseList.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
